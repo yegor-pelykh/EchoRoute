@@ -8,6 +8,7 @@ namespace EchoRoute
 
         private readonly NotifyIcon _trayIcon;
         private readonly ToolStripMenuItem _devicesMenu;
+        private readonly ToolStripMenuItem _volumeMenu;
         private readonly DeviceManager _deviceManager;
         private readonly AudioDuplicator _duplicator;
         private MMDevice? _selectedExtraDevice;
@@ -18,9 +19,11 @@ namespace EchoRoute
             _duplicator = new AudioDuplicator();
 
             _devicesMenu = new ToolStripMenuItem(Strings.ExtraOutputDevice);
+            _volumeMenu = new ToolStripMenuItem(Strings.ExtraDeviceVolume);
 
             var trayMenu = new ContextMenuStrip();
             trayMenu.Items.Add(_devicesMenu);
+            trayMenu.Items.Add(_volumeMenu);
             trayMenu.Items.Add(new ToolStripSeparator());
             trayMenu.Items.Add(new ToolStripMenuItem(Strings.Exit, null, OnExit));
 
@@ -38,6 +41,7 @@ namespace EchoRoute
             _deviceManager.DefaultDeviceChanged += UpdateDevicesMenu;
 
             UpdateDevicesMenu();
+            UpdateVolumeMenu();
         }
 
         private void UpdateDevicesMenu()
@@ -71,6 +75,8 @@ namespace EchoRoute
             {
                 SelectExtraDevice(null, defaultDevice);
             }
+
+            UpdateVolumeMenu();
         }
 
         private void SelectExtraDevice(MMDevice? device, MMDevice defaultDevice)
@@ -90,6 +96,41 @@ namespace EchoRoute
             }
 
             UpdateDevicesMenu();
+            UpdateVolumeMenu();
+        }
+
+        private void UpdateVolumeMenu()
+        {
+            _volumeMenu.DropDownItems.Clear();
+
+            var enabled = _selectedExtraDevice != null;
+            _volumeMenu.Enabled = enabled;
+
+            if (!enabled)
+            {
+                _volumeMenu.Text = Strings.ExtraDeviceVolume;
+                return;
+            }
+
+            var volume = _duplicator.ExtraVolume;
+            var percent = (int)(volume * 100);
+            _volumeMenu.Text = string.Format(Strings.ExtraDeviceVolumeValue, percent);
+
+            for (var i = 0; i <= 5; i++)
+            {
+                var p = i * 20;
+                var v = p / 100f;
+                var item = new ToolStripMenuItem($"{p}%")
+                {
+                    Checked = Math.Abs(_duplicator.ExtraVolume - v) < 0.01f
+                };
+                item.Click += (_, _) =>
+                {
+                    _duplicator.ExtraVolume = v;
+                    UpdateVolumeMenu();
+                };
+                _volumeMenu.DropDownItems.Add(item);
+            }
         }
 
         private void OnExit(object? sender, EventArgs e)

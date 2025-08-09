@@ -14,6 +14,24 @@ namespace EchoRoute
         private MMDevice? _extraDevice;
         private Thread? _copyThread;
         private bool _running;
+        private float _extraVolume = 1.0f;
+
+        public float ExtraVolume
+        {
+            get => _extraVolume;
+            set
+            {
+                _extraVolume = Math.Clamp(value, 0f, 1f);
+                if (_extraOut != null)
+                {
+                    try
+                    {
+                        _extraOut.Volume = _extraVolume;
+                    }
+                    catch { }
+                }
+            }
+        }
 
         public void Start(MMDevice defaultDevice, MMDevice extraDevice)
         {
@@ -41,10 +59,12 @@ namespace EchoRoute
             _defaultOut.Init(_bufferDefault);
             _extraOut.Init(_bufferExtra);
 
+            _defaultOut.Play();
+            _extraOut.Volume = _extraVolume;
+            _extraOut.Play();
+
             _running = true;
             _capture.StartRecording();
-            _defaultOut.Play();
-            _extraOut.Play();
 
             _copyThread = new Thread(BufferCleaner) { IsBackground = true };
             _copyThread.Start();
