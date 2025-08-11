@@ -6,6 +6,14 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>TrayIcon.ico</ApplicationIcon>
+    <Description>Duplicate audio output to an extra device</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/yegor-pelykh/EchoRoute</RepositoryUrl>
+    <PackageTags>audio;voice;echo;device;duplicate</PackageTags>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <Authors>Yegor Pelykh</Authors>
+    <Copyright>Copyright © 2025 Yegor Pelykh</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +28,17 @@
     <Content Include="TrayIcon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
