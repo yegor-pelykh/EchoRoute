@@ -87,7 +87,21 @@ namespace EchoRoute
 
             if (device != null && device.ID != defaultDevice.ID)
             {
-                _duplicator.Start(defaultDevice, device);
+                var mainVolume = 1.0f;
+                try
+                {
+                    mainVolume = defaultDevice.AudioEndpointVolume.MasterVolumeLevelScalar;
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                var rounded = (float)Math.Round(mainVolume / 0.2f) * 0.2f;
+                rounded = Math.Clamp(rounded, 0f, 1f);
+
+                _duplicator.Start(defaultDevice, device, rounded);
+
                 _trayIcon.Text = string.Format(Strings.DuplicationOn, device.FriendlyName);
             }
             else
